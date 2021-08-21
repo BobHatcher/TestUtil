@@ -20,7 +20,7 @@ public with sharing class DemoTestUtilUsage {
         c = [SELECT BillingCity FROM Account WHERE Id =: c.Id];
         System.assertEquals(c.BillingCity,'Invercargill','Billing City Was ' + c.BillingCity + ', Expected \'Invercargill\'');
     }
-
+ 
     @IsTest
     public static void demoTestUsers(){
         // This method is very handy for avoiding MIXED_DML_OPERATION errors.
