@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Error__c</fullName>
+    <description>Parent Error</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Parent Error</inlineHelpText>
+    <label>Error</label>
+    <referenceTo>Error__c</referenceTo>
+    <relationshipLabel>DML Errors</relationshipLabel>
+    <relationshipName>DML_Errors</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>
