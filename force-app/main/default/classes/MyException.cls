@@ -1,5 +1,33 @@
+/** 
+ * MyException 
+ * Bob Hatcher - @BobHatcher
+ * www.stupidcrmtricks.com
+ * More Info: https://github.com/BobHatcher/TestUtil/wiki
+ * 
+    MIT License
+
+    Copyright (c) 2021 Robert E Hatcher
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE. 
+ */
+
 /**
- * Created by Bob.Hatcher on 6/14/21.
  *
  *
  *  ******* MyException *******
@@ -27,8 +55,9 @@
  *
  */
 
+@SuppressWarnings('PMD.CognitiveComplexity, PMD.ExcessiveParameterList')
 public without sharing virtual class MyException extends Exception{
-    private static Integer ERROR_DEPTH = 0; // use to prevent runaway recursion
+    private static Integer errorDepth = 0; // use to prevent runaway recursion
     private static final Integer MAX_DEPTH = 5;
     private static final String IGNORE = 'MyException-Ignore-RandomString-ZS-NMS';
     public static final String NULL_ID = '=0= Insert/Del Op?';
@@ -53,8 +82,9 @@ public without sharing virtual class MyException extends Exception{
         This version is tolerant of the sObject parameter coming in as null.
      */
     public static void logError(Exception e, String code, String className, String methodName, String developerMessage, sObject obj){
-        if (depthCheck())
+        if (depthCheck()){
             return;
+        }
         Error__c err = baseError(e,code, className,methodName,developerMessage);
         try {
             err.Record_Ids__c = (obj == null || obj.Id == null ? NULL_ID : obj?.Id);
@@ -69,7 +99,7 @@ public without sharing virtual class MyException extends Exception{
                     insertDMLErrorRecords(e,errorId, obj?.getSObjectType());
                 }
             }
-            ERROR_DEPTH --;
+            errorDepth --;
         } catch (Exception exc){
             Util.debug('logError Failed. Message: ' + exc.getMessage());
             Util.debug('logError Failed. Stack Trace: ' + exc.getStackTraceString());
@@ -88,17 +118,19 @@ public without sharing virtual class MyException extends Exception{
         This version will not work correctly if the list of sObjects is zero-length or null
      */
     public static void logError(Exception e,  String code, String className, String methodName, String developerMessage, List<sObject> objects){
-        if (depthCheck())
+        if (depthCheck()){
             return;
+        }
         Error__c err = baseError(e,code,className,methodName,developerMessage);
         if (objects != null && objects.size() > 0){
             try {
                 // this will fail if the record(s) are deleted
                 err.Record_Ids__c = Util.idsFromList(objects)?.abbreviate(255);
                 Id errorId = insertError(e,err);
-                if (isDML(e))
+                if (isDML(e)){
                     insertDMLErrorRecords(e,errorId, objects[0].getSObjectType());
-                ERROR_DEPTH --;
+                }
+                errorDepth --;
             } catch (MyException exc){
                 Util.debug('logError (List<sObject>) Failed. Message: ' + exc.getMessage());
                 Util.debug('logError (List<sObject>) Failed. Stack Trace: ' + exc.getStackTraceString());
@@ -117,8 +149,9 @@ public without sharing virtual class MyException extends Exception{
         Use this version when you have an sObjectType only - primarily on delete operations
      */
     public static void logError(Exception e, String code, String className, String methodName, String developerMessage, sObjectType typ){
-        if (depthCheck())
+        if (depthCheck()){
             return;
+        }
         Error__c err = baseError(e,code,className,methodName,developerMessage);
         err.Record_Ids__c = NULL_ID;
         try {
@@ -126,7 +159,7 @@ public without sharing virtual class MyException extends Exception{
             if (isDML(e)){
                 insertDMLErrorRecords(e,errorId, typ);
             }
-            ERROR_DEPTH --;
+            errorDepth --;
         } catch (Exception exc){
             Util.debug('logError Failed. (Type Only Version) Message: ' + exc.getMessage());
             Util.debug('logError Failed. (Type Only Version) Stack Trace: ' + exc.getStackTraceString());
@@ -210,8 +243,11 @@ public without sharing virtual class MyException extends Exception{
     private static Id insertError(Exception e, Error__c err){
         try{
             Util.debug('Attempting to Insert Error__c:' + Util.printSObject(err));
-            insert err;
-            return err.Id;
+            if (!Schema.sObjectType.Error__c.isCreateable()){
+                insert err;
+                return err.Id;
+            }
+            
         } catch (Exception secondException) {
             // If this trips it's probably because there is something wrong like a new picklist value on the Error__c object
             Util.debug('\nError inserting Error__c Record While Attempting to Log: ' + e.getStackTraceString() + '\n Error Thrown while Inserting the Error: ' + secondException.getStackTraceString());
@@ -225,10 +261,10 @@ public without sharing virtual class MyException extends Exception{
     }
 
     public static Boolean depthCheck(){
-        ERROR_DEPTH ++;
-        if (ERROR_DEPTH >= MAX_DEPTH){
+        errorDepth ++;
+        if (errorDepth >= MAX_DEPTH){
             Util.debug('*** Max Debug Depth ('+MAX_DEPTH+') Reached in MyException ***');
             return true;
-        } else return false;
+        } else { return false; }
     }
 }

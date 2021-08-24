@@ -1,12 +1,49 @@
+/** 
+ * TestUtilTest 
+ * Bob Hatcher - @BobHatcher
+ * www.stupidcrmtricks.com
+ * More Info: https://github.com/BobHatcher/TestUtil/wiki
+ * 
+    MIT License
+
+    Copyright (c) 2021 Robert E Hatcher
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE. 
+ */
 
 @IsTest
 public with sharing class TestUtilTest {
 
-    // Test class assumes there are Test_Code_Defa ult__mdt records for Account:
-    // BillingStreet = 123 Cumberland St
-    // AnnualRevenue = 1000
-    // Name = Test Account
-    // These values should have Is_Test__c = true
+    /**
+     * Test class assumes there are Test_Code_Default__mdt records
+     *  sObject__c  sObjectField__c Picklist_Value_ Text_Value__c       Type__c     Is_Test__c
+        Account     AnnualRevenue                                       Number      TRUE
+        Account     Name                            Test Account        Text        TRUE    
+        Account     BillingStreet                   123 Cumberland St.  Text        TRUE
+        Refund      Type            NonReferenced                       Picklist    TRUE
+        Refund      ProcessingMode  External                            Picklist    TRUE
+        Refund      Status          Draft                               Picklist    TRUE
+        Refund      Amount                                              Number      TRUE
+        User        TimeZoneSIDKey                  America/New York    Text        TRUE    
+        User        LocaleSidKey                    en_US               Text        TRUE    
+        User        EmailEncodingKey                ISO-8859-1          Text        TRUE
+     */
 
     static{
         TestUtil.restrictDefaultsToIsTest = true;
@@ -14,7 +51,7 @@ public with sharing class TestUtilTest {
     @isTest
     public static void baseTest(){
 
-        // (1) Test Text fields
+        // Test Text fields
         Account a = (Account) TestUtil.newObject('Account',true);
         a = [SELECT Id, Name, AnnualRevenue,BillingStreet FROM Account WHERE Id =: a.Id];
         System.assertEquals(a.Name,'Test Account','Expected value \'Test Account\', Got ' + a.Name);
@@ -98,6 +135,10 @@ public with sharing class TestUtilTest {
         // List is ordered so 0,1,2 are admins, 3,4,5 are contract managers (standard profile)
         System.runAs(users[3]){
             Boolean gotError = false;
+
+            // Using Refund here since it is a standard object where Contract Manager, a standard
+            // Profile, does not have any permissions. There are Test Code Default records since
+            // Refund has four required fields.
             Refund refundRecord = (Refund) TestUtil.newObject('Refund');
             try{
                 TestUtil.insertRecord(refundRecord,true);
