@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>[TEST] Refund Type</label>
+    <protected>false</protected>
+    <values>
+        <field>Blob_Value__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Checkbox_Value__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>DateTime_Value__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Date_Value__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Email_Value__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Is_Test__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Long_Text_Value__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Lookup_Field__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Lookup_Object__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Lookup_Value__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Number_Value__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Percent_Value__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Phone_Value__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Picklist_Value__c</field>
+        <value xsi:type="xsd:string">NonReferenced</value>
+    </values>
+    <values>
+        <field>Text_Area_Value__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Text_Value__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Type__c</field>
+        <value xsi:type="xsd:string">Picklist</value>
+    </values>
+    <values>
+        <field>URL_Value__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>sObjectField__c</field>
+        <value xsi:type="xsd:string">Type</value>
+    </values>
+    <values>
+        <field>sObject__c</field>
+        <value xsi:type="xsd:string">Refund</value>
+    </values>
+</CustomMetadata>

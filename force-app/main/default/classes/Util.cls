@@ -7,12 +7,14 @@
  * 
  */
 
-global with sharing class Util {
+@SuppressWarnings('PMD.CognitiveComplexity, PMD.ExcessiveParameterList')
+public with sharing class Util {
 
-    public static Boolean TEST_SCENARIO = false;
-    public static Map<String,String> g_config = initConfig();
+    public static Boolean isTestScenario = false;
+    public static Map<String,String> globalConfig = initConfig();
     public static final Boolean IS_TEST = Test.isRunningTest(); // Alias the heavy function
     public static final String MASTER_DOMAIN = 'stupidsalesforcetricks.com';
+    public static final string PROFILE_ADMIN = 'System Administrator';
 
     public static Map<String,String> initConfig(){
         Map<String,String> config = new Map<String,String>();
@@ -38,27 +40,27 @@ global with sharing class Util {
      */
 
     public static String getConfig(String configName){
-        if (g_config == null || g_config?.size() == 0 || !g_config.containsKey(configName.toLowerCase())){
+        if (globalConfig == null || globalConfig?.size() == 0 || !globalConfig.containsKey(configName.toLowerCase())){
             throw new MyException('Config table missing value: ' + configName);
         } else {
-            return g_config.get(configName?.toLowerCase());
+            return globalConfig.get(configName?.toLowerCase());
         }
     }
 
     public static Boolean getBoolConfig(String configName){
-        if (g_config == null || g_config?.size() == 0 || !g_config.containsKey(configName.toLowerCase())){
+        if (globalConfig == null || globalConfig?.size() == 0 || !globalConfig.containsKey(configName.toLowerCase())){
             throw new MyException('Config table missing value: ' + configName);
         } else {
-            return Boolean.valueOf(g_config.get(configName?.toLowerCase()));
+            return Boolean.valueOf(globalConfig.get(configName?.toLowerCase()));
         }
     }
 
     public static void setConfigForTest(String configName, String configValue){
-        g_config.put(configName,configValue);
+        globalConfig.put(configName,configValue);
     }
 
     public static void setConfigForTest(String configName, Boolean configValue){
-        g_config.put(configName,String.valueOf(configValue));
+        globalConfig.put(configName,String.valueOf(configValue));
     }
 
     public static Boolean rand5050(){
@@ -199,8 +201,9 @@ global with sharing class Util {
     }
     public static String printSObject(sObject record, Integer spacePad, Integer recordNumber, Integer totalQuantity, Boolean asTable, String parentObjectType) {
 
-        if (record == null)
+        if (record == null){
             return '-- Record Is Null --';
+        }
         try {
             String pad = getPad(spacePad);
             Boolean isSubObject = parentObjectType != null;
@@ -215,8 +218,9 @@ global with sharing class Util {
             Map<String, Object> fieldsAndValues = record.getPopulatedFieldsAsMap();
             pad = pad + '  '; // indent fields
 
-            if (asTable)
+            if (asTable){
                 out += '<TABLE style="border:1px solid black;"><TR><TH>Field</TH><TH>Type</th><th>Value</th></tr>';
+            }
             for (String field : fieldsAndValues.keySet()) {
                 if (field != null) {
                     out += printSingleObject(fieldsAndValues.get(field), spacePad + 5, asTable, thisObjectType, field);
@@ -283,31 +287,37 @@ global with sharing class Util {
         }
         return pad;
     }
-
+    
+    @SuppressWarnings('PMD.NcssMethodCount')
     public static string getType(Object o) {
         try {
-            if(o==null) return '';              // we can't say much about null with our current techniques
-            if (getBaseType(o) == 'sObjectList'){
-                if (((List<sObject>) o).size() > 0)
-                    return getType(((List<sObject>)o)[0]);
+            if(o==null) {
+                return '';              // we can't say much about null with our current techniques
             }
-            if (IS_TEST && TEST_SCENARIO){
+            if (getBaseType(o) == 'sObjectList'){
+                if (((List<sObject>) o).size() > 0){
+                    return getType(((List<sObject>)o)[0]);
+                }
+            }
+            if (IS_TEST && isTestScenario){
                 throw new MyException('Exception For Test');
             }
-            if(o instanceof SObject)            return ((SObject)o).getSObjectType().getDescribe().getName()+'';
-            if(o instanceof Boolean)            return 'Boolean';
-            if(o instanceof Id)                 return 'Id';
-            if(o instanceof String)             return 'String';
-            if(o instanceof Blob)               return 'Blob';
-            if(o instanceof Date)               return 'Date';
-            if(o instanceof Datetime)           return 'Datetime';
-            if(o instanceof Time)               return 'Time';
-            if(o instanceof String)             return 'String';
-            if(o instanceof Integer)            return 'Integer';
-            if(o instanceof Long)               return 'Long';
-            if(o instanceof Decimal)            return 'Decimal';  // we can't distinguish between decimal and double
-            if(o instanceof Double)             return 'Double';   // we can't distinguish between decimal and double
-            if(o instanceof List<object>)       return 'List';
+            if(o instanceof SObject){
+                return ((SObject)o).getSObjectType().getDescribe().getName()+'';
+            }
+            if(o instanceof Boolean)            {return 'Boolean';}
+            if(o instanceof Id)                 {return 'Id';}
+            if(o instanceof String)             {return 'String';}
+            if(o instanceof Blob)               {return 'Blob';}
+            if(o instanceof Date)               {return 'Date';}
+            if(o instanceof Datetime)           {return 'Datetime';}
+            if(o instanceof Time)               {return 'Time';}
+            if(o instanceof String)             {return 'String';}
+            if(o instanceof Integer)            {return 'Integer';}
+            if(o instanceof Long)               {return 'Long';}
+            if(o instanceof Decimal)            {return 'Decimal';}  // we can't distinguish between decimal and double
+            if(o instanceof Double)             {return 'Double';}   // we can't distinguish between decimal and double
+            if(o instanceof List<object>)       {return 'List';}
             return 'Object';                    // actually we can't detect maps and sets and maps
         }
         catch (Exception e){
@@ -317,27 +327,28 @@ global with sharing class Util {
 
     }
 
+    @SuppressWarnings('PMD.NcssMethodCount')
     public static String getBaseType (Object o){
         try {
-            if (IS_TEST && TEST_SCENARIO){
+            if (IS_TEST && isTestScenario){
                 throw new MyException('Exception For Test');
             }
-            if(o==null) return '';              // we can't say much about null with our current techniques
-            if(o instanceof List<sObject>)       return 'sObjectList';
-            if(o instanceof SObject)            return 'sObject';
-            if(o instanceof Boolean)            return 'Object';
-            if(o instanceof Id)                 return 'Object';
-            if(o instanceof String)             return 'Object';
-            if(o instanceof Blob)               return 'Object';
-            if(o instanceof Date)               return 'Object';
-            if(o instanceof Datetime)           return 'Object';
-            if(o instanceof Time)               return 'Object';
-            if(o instanceof String)             return 'Object';
-            if(o instanceof Integer)            return 'Object';
-            if(o instanceof Long)               return 'Object';
-            if(o instanceof Decimal)            return 'Object';  // we can't distinguish between decimal and double
-            if(o instanceof Double)             return 'Object';   // we can't distinguish between decimal and double
-            if(o instanceof List<object>)       return 'ObjectList';
+            if(o==null) {return '';    }          // we can't say much about null with our current techniques
+            if(o instanceof List<sObject>)       {return 'sObjectList';}
+            if(o instanceof SObject)            {return 'sObject';}
+            if(o instanceof Boolean)            {return 'Object';}
+            if(o instanceof Id)                 {return 'Object';}
+            if(o instanceof String)             {return 'Object';}
+            if(o instanceof Blob)               {return 'Object';}
+            if(o instanceof Date)               {return 'Object';}
+            if(o instanceof Datetime)           {return 'Object';}
+            if(o instanceof Time)               {return 'Object';}
+            if(o instanceof String)             {return 'Object';}
+            if(o instanceof Integer)            {return 'Object';}
+            if(o instanceof Long)               {return 'Object';}
+            if(o instanceof Decimal)            {return 'Object';}  // we can't distinguish between decimal and double
+            if(o instanceof Double)             {return 'Object';}   // we can't distinguish between decimal and double
+            if(o instanceof List<object>)       {return 'ObjectList';}
             return 'Object';                    // actually we can't detect maps and sets and maps
         } catch (Exception e){
             MyException.logError(e,'Util_GET_BASE_TYPE_FAILURE','Util','getBaseType');
